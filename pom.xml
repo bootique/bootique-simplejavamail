@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.bootique.modules.parent</groupId>
+        <artifactId>bootique-modules-parent</artifactId>
+        <version>1.2</version>
+    </parent>
+
+    <groupId>io.bootique.simplejavamail</groupId>
+    <artifactId>bootique-simplejavamail-parent</artifactId>
+    <version>2.0-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <name>bootique-simplejavamail-parent: Parent of Simple Java Mail integration modules</name>
+    <description>
+        Parent of Simple Java Mail integration modules
+    </description>
+
+    <properties>
+        <bootique.version>${project.version}</bootique.version>
+        <simplejavamail.version>6.0.3</simplejavamail.version>
+    </properties>
+
+    <modules>
+        <module>bootique-simplejavamail</module>
+    </modules>
+
+    <scm>
+        <developerConnection>scm:git:ssh://git@github.com/bootique/bootique-simplejavamail</developerConnection>
+        <url>https://github.com/bootique/bootique-simplejavamail</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-bootique-releases</id>
+            <name>bintray-bootique-releases</name>
+            <url>https://api.bintray.com/maven/bootique/releases/bootique-simplejavamail/;publish=1</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>linkrest-snapshots</id>
+            <url>https://maven.objectstyle.org/nexus/content/repositories/linkrest-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.simplejavamail</groupId>
+                <artifactId>simple-java-mail</artifactId>
+                <version>${simplejavamail.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.bootique</groupId>
+                <artifactId>bootique</artifactId>
+                <version>${bootique.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.bootique</groupId>
+                <artifactId>bootique-test</artifactId>
+                <version>${bootique.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
