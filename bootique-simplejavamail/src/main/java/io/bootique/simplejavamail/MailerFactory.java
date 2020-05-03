@@ -23,7 +23,6 @@ import io.bootique.annotation.BQConfigProperty;
 import io.bootique.value.Duration;
 import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
-import org.simplejavamail.internal.batchsupport.concurrent.NonJvmBlockingThreadPoolExecutor;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
 
@@ -58,9 +57,6 @@ public class MailerFactory {
 
     public Mailer createMailer(boolean disabled) {
 
-        int threadPoolSize = resolveThreadPoolSize();
-        int threadPullKepAliveTime = resolveThreadPoolKeepAliveTimeMs();
-
         MailerRegularBuilderImpl builder = MailerBuilder
                 .withSMTPServer(resolveSmtpServer(), resolveSmtpPort())
                 .withSMTPServerUsername(username)
@@ -69,12 +65,8 @@ public class MailerFactory {
                 .withTransportStrategy(resolveTransportStrategy())
                 .withProperties(resolveJavamailProperties())
 
-                // executor service properties passed directly to the builder are ignored (seems to be a bug in SJM),
-                // so need to rebuild our own executor service from scratch, but also set the properties for consistency.
-                // TODO: tracking this issue in SJM: https://github.com/bbottema/simple-java-mail/issues/262
-                .withExecutorService(new NonJvmBlockingThreadPoolExecutor(threadPoolSize, threadPullKepAliveTime))
-                .withThreadPoolSize(threadPoolSize)
-                .withThreadPoolKeepAliveTime(threadPullKepAliveTime)
+                .withThreadPoolSize(resolveThreadPoolSize())
+                .withThreadPoolKeepAliveTime(resolveThreadPoolKeepAliveTimeMs())
 
                 // configure connection pool
                 .withConnectionPoolExpireAfterMillis(resolveConnectionPoolExpireAfter())

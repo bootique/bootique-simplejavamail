@@ -29,6 +29,8 @@ import org.simplejavamail.api.mailer.config.TransportStrategy;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -112,6 +114,10 @@ public class SimpleJavaMailConfigIT {
 
         assertEquals(5, mailer.getOperationalConfig().getThreadPoolSize());
         assertEquals(11_000, mailer.getOperationalConfig().getThreadPoolKeepAliveTime());
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) mailer.getOperationalConfig().getExecutorService();
+        assertNotNull(executor);
+        assertEquals(5, executor.getMaximumPoolSize());
+        assertEquals(11_000, executor.getKeepAliveTime(TimeUnit.MILLISECONDS));
 
         assertEquals(12_000, mailer.getOperationalConfig().getConnectionPoolExpireAfterMillis());
         assertEquals(60_000, mailer.getOperationalConfig().getConnectionPoolClaimTimeoutMillis());
