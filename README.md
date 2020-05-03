@@ -51,6 +51,7 @@ Import Simple Java Mail integration:
 Configure the app:
 ```yaml
 simplejavamail:
+
   # Mail delivery is disabled by default to prevent inadvertent spamming when the app is in development. This property
   # needs to be flipped to "false" if you want mail to be actually sent to someone.
   disabled: false
@@ -76,7 +77,7 @@ public void sendMail() {
         .withPlainText("Hello world..")
         .buildEmail();
 
-    // of only one mailer is configured in YAML, it is assumed to be the default mailer
+    // if only one mailer is configured in YAML, it is assumed to be the default mailer
     mailers.getDefaultMailer().sendMail(email, false);
 }
 ```
