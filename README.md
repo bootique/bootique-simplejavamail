@@ -20,7 +20,7 @@
 [![Build Status](https://travis-ci.org/bootique/bootique-simplejavamail.svg)](https://travis-ci.org/bootique/bootique-simplejavamail)
 [![Maven Central](https://img.shields.io/maven-central/v/io.bootique.simplejavamail/bootique-simplejavamail.svg?colorB=brightgreen)](https://search.maven.org/artifact/io.bootique.simplejavamail/bootique-simplejavamail/)
 
-# bootique-mybatis
+# bootique-simplejavamail
 
 Provides [Simple Java Mail](http://www.simplejavamail.org/) integration with [Bootique](https://bootique.io).
 
