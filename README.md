@@ -24,3 +24,60 @@
 
 Provides [Simple Java Mail](http://www.simplejavamail.org/) integration with [Bootique](https://bootique.io).
 
+## Usage
+
+Include ```bootique-bom```:
+```xml
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>io.bootique.bom</groupId>
+            <artifactId>bootique-bom</artifactId>
+            <version>2.0-SNAPSHOTS</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+Import Simple Java Mail integration:
+```xml
+<dependency>
+	<groupId>io.bootique.simplejavamail</groupId>
+	<artifactId>bootique-simplejavamail</artifactId>
+</dependency>
+```
+
+Configure the app:
+```yaml
+simplejavamail:
+  # Mail delivery is disabled by default to prevent inadvertent spamming when the app is in development. This property
+  # needs to be flipped to "false" if you want mail to be actually sent to someone.
+  disabled: false
+
+  # Configure named mailers. If "mailers" section is absent, the default mailer is created pointing to "localhost:25"
+  mailers:
+    main: # arbitrary name of the mailer
+      smtpServer: example.org
+      smtpPort: 3025
+      transportStrategy: SMTPS
+```
+
+Send mail:
+```java
+@Inject
+Mailers mailers;
+
+public void sendMail() {
+    Email email = EmailBuilder.startingBlank()
+        .from("me@example.org")
+        .to("you@example.org")
+        .withSubject("Hi!")
+        .withPlainText("Hello world..")
+        .buildEmail();
+
+    // of only one mailer is configured in YAML, it is assumed to be the default mailer
+    mailers.getDefaultMailer().sendMail(email, false);
+}
+```
+
