@@ -56,7 +56,7 @@ public class MailerFactory {
 
     // TODO: proxy settings, etc.
 
-    public Mailer createMailer() {
+    public Mailer createMailer(boolean disabled) {
 
         int threadPoolSize = resolveThreadPoolSize();
         int threadPullKepAliveTime = resolveThreadPoolKeepAliveTimeMs();
@@ -80,7 +80,9 @@ public class MailerFactory {
                 .withConnectionPoolExpireAfterMillis(resolveConnectionPoolExpireAfter())
                 .withConnectionPoolClaimTimeoutMillis(resolveConnectionPoolClaimTimeout())
                 .withConnectionPoolCoreSize(resolveConnectionPoolCoreSize())
-                .withConnectionPoolMaxSize(resolveConnectionPoolMaxSize());
+                .withConnectionPoolMaxSize(resolveConnectionPoolMaxSize())
+
+                .withTransportModeLoggingOnly(disabled);
 
         if (!resolveValidateEmails()) {
             builder.clearEmailAddressCriteria();

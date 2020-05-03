@@ -49,6 +49,7 @@ public class SimpleJavaMailDeliveryIT {
     public void testSendMail() throws MessagingException {
 
         Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
                 .createRuntime()
                 .getInstance(Mailers.class);
@@ -72,6 +73,7 @@ public class SimpleJavaMailDeliveryIT {
     public void testSendMail_Async() throws MessagingException {
 
         Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
                 .createRuntime()
                 .getInstance(Mailers.class);
@@ -94,6 +96,7 @@ public class SimpleJavaMailDeliveryIT {
     @DisplayName("'validateEmails' on")
     public void testSendMail_validateEmailsOn() throws MessagingException {
         Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
                 // 'true' is the default
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "true"))
@@ -114,6 +117,7 @@ public class SimpleJavaMailDeliveryIT {
     @DisplayName("'validateEmails' off")
     public void testSendMail_validateEmailsOff() throws MessagingException {
         Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "false"))
                 .createRuntime()
@@ -133,6 +137,46 @@ public class SimpleJavaMailDeliveryIT {
         assertEquals("test subject", received.getSubject());
         assertEquals("test body", GreenMailUtil.getBody(received));
     }
+
+    @Test
+    @DisplayName("'disabled'")
+    public void testSendMail_Disabled() throws MessagingException {
+        Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "true"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .createRuntime()
+                .getInstance(Mailers.class);
+
+        Email email = EmailBuilder.startingBlank()
+                .from("y@example.org")
+                .to("x@example.org")
+                .withSubject("test subject")
+                .withPlainText("test body")
+                .buildEmail();
+
+        mailers.getDefaultMailer().sendMail(email, false);
+        assertFalse(mailboxManager.waitForIncomingEmail(500, 1), "Email unexpected in 'disabled' mode");
+    }
+
+    @Test
+    @DisplayName("'disabled' on by default")
+    public void testSendMail_Disabled_Default() throws MessagingException {
+        Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .createRuntime()
+                .getInstance(Mailers.class);
+
+        Email email = EmailBuilder.startingBlank()
+                .from("y@example.org")
+                .to("x@example.org")
+                .withSubject("test subject")
+                .withPlainText("test body")
+                .buildEmail();
+
+        mailers.getDefaultMailer().sendMail(email, false);
+        assertFalse(mailboxManager.waitForIncomingEmail(500, 1), "Email unexpected in 'disabled' mode");
+    }
+
 
     private MimeMessage sendSync(Email email, Mailer mailer) {
         mailer.sendMail(email, false);

@@ -33,6 +33,7 @@ import java.util.Map;
 public class MailersFactory {
 
     private Map<String, MailerFactory> mailers;
+    private Boolean disabled;
 
     public Mailers createMailers() {
         Map<String, Mailer> resolvedMailers = resolveMailers();
@@ -45,11 +46,17 @@ public class MailersFactory {
         this.mailers = mailers;
     }
 
+    @BQConfigProperty("Turns mail delivery on or off for all mailers. By default the value is 'true' to prevent " +
+            "unintended emails from going out in non-production environments. So it must be set to 'false' explicitly.")
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
+
     protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers) {
         switch (resolvedMailers.size()) {
             case 0:
                 // provide an implicitly-configured default mailer
-                return new MailerFactory().createMailer();
+                return new MailerFactory().createMailer(resolveDisabled());
             case 1:
                 return resolvedMailers.values().iterator().next();
             default:
@@ -63,8 +70,14 @@ public class MailersFactory {
             return Collections.emptyMap();
         }
 
+        boolean disabled = resolveDisabled();
         Map<String, Mailer> resolved = new HashMap<>();
-        mailers.forEach((k, v) -> resolved.put(k, v.createMailer()));
+        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(disabled)));
         return resolved;
+    }
+
+    protected boolean resolveDisabled() {
+        // by default all Mailers are disabled to prevent delivery in non-production environments
+        return this.disabled != null ? this.disabled : true;
     }
 }
