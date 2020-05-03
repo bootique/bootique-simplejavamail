@@ -19,11 +19,52 @@
 package io.bootique.simplejavamail;
 
 import io.bootique.annotation.BQConfig;
+import io.bootique.annotation.BQConfigProperty;
+import org.simplejavamail.api.mailer.Mailer;
 
-@BQConfig
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @since 2.0
+ */
+@BQConfig("Configuration of mailers collection")
 public class MailersFactory {
 
-    public Mailers createMailers() {
+    private Map<String, MailerFactory> mailers;
 
+    public Mailers createMailers() {
+        Map<String, Mailer> resolvedMailers = resolveMailers();
+        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers);
+        return new DefaultMailers(resolvedMailers, defaultMailer);
+    }
+
+    @BQConfigProperty("Named mailers configuration")
+    public void setMailers(Map<String, MailerFactory> mailers) {
+        this.mailers = mailers;
+    }
+
+    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers) {
+        switch (resolvedMailers.size()) {
+            case 0:
+                // provide an implicitly-configured default mailer
+                return new MailerFactory().createMailer();
+            case 1:
+                return resolvedMailers.values().iterator().next();
+            default:
+                return null;
+        }
+    }
+
+    protected Map<String, Mailer> resolveMailers() {
+
+        if (mailers == null || mailers.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, Mailer> resolved = new HashMap<>();
+        mailers.forEach((k, v) -> resolved.put(k, v.createMailer()));
+        return resolved;
     }
 }

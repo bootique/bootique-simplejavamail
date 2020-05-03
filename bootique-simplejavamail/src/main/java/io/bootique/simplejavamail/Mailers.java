@@ -20,8 +20,10 @@ package io.bootique.simplejavamail;
 
 import org.simplejavamail.api.mailer.Mailer;
 
+import java.util.Collection;
+
 /**
- * A holder of one or more Simple Java Mail {@link org.simplejavamail.api.mailer.Mailer} mailers.
+ * A holder of one or more named {@link org.simplejavamail.api.mailer.Mailer} mailers.
  *
  * @since 2.0
  */
@@ -29,5 +31,16 @@ public interface Mailers {
 
     Mailer getMailer(String name);
 
+    /**
+     * Returns default mailer or throws an exception if it is not configured. If no explicit mailers configuration
+     * was provided when this object was created, the default mailer is created implicitly and wil use "localhost:25"
+     * for delivery. If a single named mailer was configured, it is also assumed to be the default mailer. If more
+     * than one mailer was configured, there's no default mailer, and mailers must be accessed by name using
+     * {@link #getMailer(String)}.
+     *
+     * @return default mailer
+     */
     Mailer getDefaultMailer();
+
+    Collection<String> getMailerNames();
 }

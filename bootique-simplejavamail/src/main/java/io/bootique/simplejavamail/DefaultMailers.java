@@ -18,8 +18,54 @@
  */
 package io.bootique.simplejavamail;
 
+import org.simplejavamail.api.mailer.Mailer;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @since 2.0
  */
 public class DefaultMailers implements Mailers {
+
+    private Map<String, Mailer> mailers;
+    private Mailer defaultMailer;
+
+    public DefaultMailers(Map<String, Mailer> mailers, Mailer defaultMailer) {
+        this.mailers = mailers;
+        this.defaultMailer = defaultMailer;
+    }
+
+    @Override
+    public Collection<String> getMailerNames() {
+        return Collections.unmodifiableCollection(mailers.keySet());
+    }
+
+    @Override
+    public Mailer getMailer(String name) {
+        Mailer mailer = mailers.get(name);
+        if (mailer == null) {
+            throw new IllegalArgumentException("Unknown mailer: " + name);
+        }
+
+        return mailer;
+    }
+
+    @Override
+    public Mailer getDefaultMailer() {
+
+        if (defaultMailer == null) {
+
+            if (mailers.size() > 1) {
+                throw new IllegalStateException("Can't determine default mailer, as more than one mailer exists. " +
+                        "Use 'getMailer(String)' to obtain a named mailer instead");
+            } else {
+                // factory shouldn't let this happen
+                throw new IllegalStateException("No default mailer configured");
+            }
+        }
+
+        return defaultMailer;
+    }
 }
