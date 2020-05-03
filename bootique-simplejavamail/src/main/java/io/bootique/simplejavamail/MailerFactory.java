@@ -41,8 +41,15 @@ public class MailerFactory {
     private String username;
     private String password;
     private Duration sessionTimeout;
+
+    private Integer connectionPoolCoreSize;
+    private Integer connectionPoolMaxSize;
+    private Duration connectionPoolClaimTimeout;
+    private Duration connectionPoolExpireAfter;
+
     private Integer threadPoolSize;
     private Duration threadPoolKeepAliveTime;
+
     private TransportStrategy transportStrategy;
     private Boolean validateEmails;
     private Map<String, String> javamailProperties;
@@ -61,12 +68,19 @@ public class MailerFactory {
                 .withSessionTimeout(resolveSessionTimeout())
                 .withTransportStrategy(resolveTransportStrategy())
                 .withProperties(resolveJavamailProperties())
+
                 // executor service properties passed directly to the builder are ignored (seems to be a bug in SJM),
                 // so need to rebuild our own executor service from scratch, but also set the properties for consistency.
                 // TODO: tracking this issue in SJM: https://github.com/bbottema/simple-java-mail/issues/262
                 .withExecutorService(new NonJvmBlockingThreadPoolExecutor(threadPoolSize, threadPullKepAliveTime))
                 .withThreadPoolSize(threadPoolSize)
-                .withThreadPoolKeepAliveTime(threadPullKepAliveTime);
+                .withThreadPoolKeepAliveTime(threadPullKepAliveTime)
+
+                // configure connection pool
+                .withConnectionPoolExpireAfterMillis(resolveConnectionPoolExpireAfter())
+                .withConnectionPoolClaimTimeoutMillis(resolveConnectionPoolClaimTimeout())
+                .withConnectionPoolCoreSize(resolveConnectionPoolCoreSize())
+                .withConnectionPoolMaxSize(resolveConnectionPoolMaxSize());
 
         if (!resolveValidateEmails()) {
             builder.clearEmailAddressCriteria();
@@ -100,6 +114,7 @@ public class MailerFactory {
         this.sessionTimeout = sessionTimeout;
     }
 
+
     @BQConfigProperty
     public void setThreadPoolSize(Integer threadPoolSize) {
         this.threadPoolSize = threadPoolSize;
@@ -109,6 +124,28 @@ public class MailerFactory {
     public void setThreadPoolKeepAliveTime(Duration threadPoolKeepAliveTime) {
         this.threadPoolKeepAliveTime = threadPoolKeepAliveTime;
     }
+
+
+    @BQConfigProperty
+    public void setConnectionPoolCoreSize(Integer connectionPoolCoreSize) {
+        this.connectionPoolCoreSize = connectionPoolCoreSize;
+    }
+
+    @BQConfigProperty
+    public void setConnectionPoolMaxSize(Integer connectionPoolMaxSize) {
+        this.connectionPoolMaxSize = connectionPoolMaxSize;
+    }
+
+    @BQConfigProperty
+    public void setConnectionPoolExpireAfter(Duration connectionPoolExpireAfter) {
+        this.connectionPoolExpireAfter = connectionPoolExpireAfter;
+    }
+
+    @BQConfigProperty
+    public void setConnectionPoolClaimTimeout(Duration connectionPoolClaimTimeout) {
+        this.connectionPoolClaimTimeout = connectionPoolClaimTimeout;
+    }
+
 
     @BQConfigProperty("One of 'SMTP' (default), 'SMTP_TLS', 'SMTPS'")
     public void setTransportStrategy(TransportStrategy transportStrategy) {
@@ -143,6 +180,22 @@ public class MailerFactory {
 
     protected boolean resolveValidateEmails() {
         return this.validateEmails != null ? validateEmails : true;
+    }
+
+    protected int resolveConnectionPoolExpireAfter() {
+        return connectionPoolExpireAfter != null ? (int) connectionPoolExpireAfter.getDuration().toMillis() : 5_000;
+    }
+
+    protected int resolveConnectionPoolClaimTimeout() {
+        return connectionPoolClaimTimeout != null ? (int) connectionPoolClaimTimeout.getDuration().toMillis() : Integer.MAX_VALUE;
+    }
+
+    protected int resolveConnectionPoolCoreSize() {
+        return connectionPoolCoreSize != null ? connectionPoolMaxSize : 0;
+    }
+
+    protected int resolveConnectionPoolMaxSize() {
+        return connectionPoolMaxSize != null ? connectionPoolMaxSize : 4;
     }
 
     protected Map<String, String> resolveJavamailProperties() {

@@ -23,7 +23,7 @@ import org.simplejavamail.api.mailer.Mailer;
 import java.util.Collection;
 
 /**
- * A holder of one or more named {@link org.simplejavamail.api.mailer.Mailer} mailers.
+ * A holder of one or more preconfigured named {@link org.simplejavamail.api.mailer.Mailer} mailers.
  *
  * @since 2.0
  */

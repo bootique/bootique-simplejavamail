@@ -87,6 +87,11 @@ public class SimpleJavaMailConfigIT {
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.password", "pwd"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.sessionTimeout", "10sec"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.threadPoolSize", "5"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.threadPoolKeepAliveTime", "11 sec"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolExpireAfter", "12 sec"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolClaimTimeout", "1 min"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolCoreSize", "2"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolMaxSzie", "6"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.transportStrategy", "SMTPS"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.javamailProperties.x", "yz"))
@@ -100,12 +105,19 @@ public class SimpleJavaMailConfigIT {
         assertEquals("un", mailer.getServerConfig().getUsername());
         assertEquals("pwd", mailer.getServerConfig().getPassword());
         assertEquals(10000, mailer.getOperationalConfig().getSessionTimeout());
+
         assertEquals(5, mailer.getOperationalConfig().getThreadPoolSize());
+        assertEquals(11_000, mailer.getOperationalConfig().getThreadPoolKeepAliveTime());
+
+        assertEquals(12_000, mailer.getOperationalConfig().getConnectionPoolExpireAfterMillis());
+        assertEquals(60_000, mailer.getOperationalConfig().getConnectionPoolClaimTimeoutMillis());
+        assertEquals(2, mailer.getOperationalConfig().getConnectionPoolCoreSize());
+        assertEquals(6, mailer.getOperationalConfig().getConnectionPoolMaxSize());
+
         assertEquals(TransportStrategy.SMTPS, mailer.getTransportStrategy());
         assertTrue(mailer.getEmailAddressCriteria().isEmpty());
 
         assertEquals("yz", mailer.getSession().getProperty("x"));
-
     }
 
 }
