@@ -21,8 +21,11 @@ package io.bootique.simplejavamail;
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
 import io.bootique.test.junit5.BQTestFactory;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.simplejavamail.api.mailer.Mailer;
+import org.simplejavamail.api.mailer.config.TransportStrategy;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -73,4 +76,36 @@ public class SimpleJavaMailConfigIT {
         assertNotNull(mailers.getMailer("y"));
         assertThrows(IllegalStateException.class, () -> mailers.getDefaultMailer());
     }
+
+    @Test
+    @DisplayName("Explicit values to all supported config properties")
+    public void testMailer_FullConfig() {
+        BQRuntime runtime = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpServer", "example.org"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "11111"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.username", "un"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.password", "pwd"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.sessionTimeout", "10sec"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.threadPoolSize", "5"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.transportStrategy", "SMTPS"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "false"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.javamailProperties.x", "yz"))
+
+                .createRuntime();
+
+        Mailer mailer = runtime.getInstance(Mailers.class).getMailer("x");
+        assertNotNull(mailer);
+        assertEquals("example.org", mailer.getServerConfig().getHost());
+        assertEquals(11111, mailer.getServerConfig().getPort());
+        assertEquals("un", mailer.getServerConfig().getUsername());
+        assertEquals("pwd", mailer.getServerConfig().getPassword());
+        assertEquals(10000, mailer.getOperationalConfig().getSessionTimeout());
+        assertEquals(5, mailer.getOperationalConfig().getThreadPoolSize());
+        assertEquals(TransportStrategy.SMTPS, mailer.getTransportStrategy());
+        assertTrue(mailer.getEmailAddressCriteria().isEmpty());
+
+        assertEquals("yz", mailer.getSession().getProperty("x"));
+
+    }
+
 }

@@ -20,9 +20,14 @@ package io.bootique.simplejavamail;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.value.Duration;
 import org.simplejavamail.api.mailer.Mailer;
+import org.simplejavamail.api.mailer.config.TransportStrategy;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * @since 2.0
@@ -32,9 +37,27 @@ public class MailerFactory {
 
     private String smtpServer;
     private Integer smtpPort;
+    private String username;
+    private String password;
+    private Duration sessionTimeout;
+    private Integer threadPoolSize;
+    private TransportStrategy transportStrategy;
+    private Boolean validateEmails;
+    private Map<String, String> javamailProperties;
 
     public Mailer createMailer() {
-        MailerRegularBuilderImpl builder = MailerBuilder.withSMTPServer(resolveSmtpServer(), resolveSmtpPort());
+        MailerRegularBuilderImpl builder = MailerBuilder
+                .withSMTPServer(resolveSmtpServer(), resolveSmtpPort())
+                .withSMTPServerUsername(username)
+                .withSMTPServerPassword(password)
+                .withSessionTimeout(resolveSessionTimeout())
+                .withThreadPoolSize(resolveThreadPoolSize())
+                .withTransportStrategy(resolveTransportStrategy())
+                .withProperties(resolveJavamailProperties());
+
+        if(!resolveValidateEmails()) {
+            builder.clearEmailAddressCriteria();
+        }
 
         return builder.buildMailer();
     }
@@ -49,11 +72,67 @@ public class MailerFactory {
         this.smtpPort = smtpPort;
     }
 
+    @BQConfigProperty
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @BQConfigProperty
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @BQConfigProperty
+    public void setSessionTimeout(Duration sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
+    }
+
+    @BQConfigProperty
+    public void setThreadPoolSize(Integer threadPoolSize) {
+        this.threadPoolSize = threadPoolSize;
+    }
+
+    @BQConfigProperty("One of 'SMTP' (default), 'SMTP_TLS', 'SMTPS'")
+    public void setTransportStrategy(TransportStrategy transportStrategy) {
+        this.transportStrategy = transportStrategy;
+    }
+
+    @BQConfigProperty("Should email addresses be validated. 'true' is the default")
+    public void setValidateEmails(Boolean validateEmails) {
+        this.validateEmails = validateEmails;
+    }
+
+    @BQConfigProperty("Optional map of properties passed directly to the underlying JavaMail engine")
+    public void setJavamailProperties(Map<String, String> javamailProperties) {
+        this.javamailProperties = javamailProperties;
+    }
+
     protected String resolveSmtpServer() {
         return this.smtpServer != null ? this.smtpServer : "127.0.0.1";
     }
 
     protected int resolveSmtpPort() {
         return this.smtpPort != null ? this.smtpPort : 25;
+    }
+
+    protected int resolveSessionTimeout() {
+        return sessionTimeout != null ? (int) sessionTimeout.getDuration().toMillis() : 60_000;
+    }
+
+    protected int resolveThreadPoolSize() {
+        // default value in SJM is 10.. I suppose we don't need such a big pool for most cases
+        return threadPoolSize != null ? threadPoolSize : 2;
+    }
+
+    protected TransportStrategy resolveTransportStrategy() {
+        return this.transportStrategy != null ? this.transportStrategy : TransportStrategy.SMTP;
+    }
+
+    protected boolean resolveValidateEmails() {
+        return this.validateEmails != null ? validateEmails : true;
+    }
+
+    protected Map<String, String> resolveJavamailProperties() {
+        return this.javamailProperties != null ? this.javamailProperties : Collections.emptyMap();
     }
 }

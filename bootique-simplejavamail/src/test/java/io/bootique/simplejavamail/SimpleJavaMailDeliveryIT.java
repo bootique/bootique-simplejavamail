@@ -22,8 +22,10 @@ import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 import io.bootique.BQCoreModule;
 import io.bootique.test.junit5.BQTestFactory;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.simplejavamail.MailException;
 import org.simplejavamail.api.email.Email;
 import org.simplejavamail.email.EmailBuilder;
 
@@ -32,6 +34,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SimpleJavaMailDeliveryIT {
 
@@ -42,6 +45,7 @@ public class SimpleJavaMailDeliveryIT {
     public BQTestFactory testFactory = new BQTestFactory().autoLoadModules();
 
     @Test
+    @DisplayName("Delivery with (almost) default config")
     public void testSendMail() throws MessagingException {
 
         Mailers mailers = testFactory.app()
@@ -61,6 +65,53 @@ public class SimpleJavaMailDeliveryIT {
         MimeMessage[] received = mailboxManager.getGreenMail().getReceivedMessages();
         assertEquals(1, received.length);
         assertEquals("y@example.org", received[0].getFrom()[0].toString());
+        assertEquals("x@example.org", received[0].getRecipients(Message.RecipientType.TO)[0].toString());
+        assertEquals("test subject", received[0].getSubject());
+        assertEquals("test body", GreenMailUtil.getBody(received[0]));
+    }
+
+    @Test
+    @DisplayName("'validateEmails' on")
+    public void testSendMail_validateEmailsOn() throws MessagingException {
+        Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                // 'true' is the default
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "true"))
+                .createRuntime()
+                .getInstance(Mailers.class);
+
+        Email email = EmailBuilder.startingBlank()
+                .from("_invalid_")
+                .to("x@example.org")
+                .withSubject("test subject")
+                .withPlainText("test body")
+                .buildEmail();
+
+
+        assertThrows(MailException.class, () -> mailers.getDefaultMailer().sendMail(email));
+    }
+
+    @Test
+    @DisplayName("'validateEmails' off")
+    public void testSendMail_validateEmailsOff() throws MessagingException {
+        Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "false"))
+                .createRuntime()
+                .getInstance(Mailers.class);
+
+        Email email = EmailBuilder.startingBlank()
+                .from("_invalid_")
+                .to("x@example.org")
+                .withSubject("test subject")
+                .withPlainText("test body")
+                .buildEmail();
+
+        mailers.getDefaultMailer().sendMail(email);
+
+        MimeMessage[] received = mailboxManager.getGreenMail().getReceivedMessages();
+        assertEquals(1, received.length);
+        assertEquals("_invalid_", received[0].getFrom()[0].toString());
         assertEquals("x@example.org", received[0].getRecipients(Message.RecipientType.TO)[0].toString());
         assertEquals("test subject", received[0].getSubject());
         assertEquals("test body", GreenMailUtil.getBody(received[0]));
