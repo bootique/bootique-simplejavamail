@@ -50,6 +50,11 @@
                 <version>${simplejavamail.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.simplejavamail</groupId>
+                <artifactId>batch-module</artifactId>
+                <version>${simplejavamail.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>io.bootique</groupId>
                 <artifactId>bootique</artifactId>
                 <version>${bootique.version}</version>

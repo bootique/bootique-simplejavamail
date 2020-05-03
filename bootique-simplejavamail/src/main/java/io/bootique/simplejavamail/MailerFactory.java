@@ -23,6 +23,7 @@ import io.bootique.annotation.BQConfigProperty;
 import io.bootique.value.Duration;
 import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
+import org.simplejavamail.internal.batchsupport.concurrent.NonJvmBlockingThreadPoolExecutor;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
 
@@ -41,21 +42,32 @@ public class MailerFactory {
     private String password;
     private Duration sessionTimeout;
     private Integer threadPoolSize;
+    private Duration threadPoolKeepAliveTime;
     private TransportStrategy transportStrategy;
     private Boolean validateEmails;
     private Map<String, String> javamailProperties;
 
+    // TODO: proxy settings, etc.
+
     public Mailer createMailer() {
+
+        int threadPoolSize = resolveThreadPoolSize();
+        int threadPullKepAliveTime = resolveThreadPoolKeepAliveTimeMs();
+
         MailerRegularBuilderImpl builder = MailerBuilder
                 .withSMTPServer(resolveSmtpServer(), resolveSmtpPort())
                 .withSMTPServerUsername(username)
                 .withSMTPServerPassword(password)
                 .withSessionTimeout(resolveSessionTimeout())
-                .withThreadPoolSize(resolveThreadPoolSize())
                 .withTransportStrategy(resolveTransportStrategy())
-                .withProperties(resolveJavamailProperties());
+                .withProperties(resolveJavamailProperties())
+                // executor service properties passed directly to the builder are ignored (seems to be a bug in SJM),
+                // so need to rebuild our own executor service from scratch, but also set the properties for consistency
+                .withExecutorService(new NonJvmBlockingThreadPoolExecutor(threadPoolSize, threadPullKepAliveTime))
+                .withThreadPoolSize(threadPoolSize)
+                .withThreadPoolKeepAliveTime(threadPullKepAliveTime);
 
-        if(!resolveValidateEmails()) {
+        if (!resolveValidateEmails()) {
             builder.clearEmailAddressCriteria();
         }
 
@@ -92,6 +104,11 @@ public class MailerFactory {
         this.threadPoolSize = threadPoolSize;
     }
 
+    @BQConfigProperty
+    public void setThreadPoolKeepAliveTime(Duration threadPoolKeepAliveTime) {
+        this.threadPoolKeepAliveTime = threadPoolKeepAliveTime;
+    }
+
     @BQConfigProperty("One of 'SMTP' (default), 'SMTP_TLS', 'SMTPS'")
     public void setTransportStrategy(TransportStrategy transportStrategy) {
         this.transportStrategy = transportStrategy;
@@ -119,11 +136,6 @@ public class MailerFactory {
         return sessionTimeout != null ? (int) sessionTimeout.getDuration().toMillis() : 60_000;
     }
 
-    protected int resolveThreadPoolSize() {
-        // default value in SJM is 10.. I suppose we don't need such a big pool for most cases
-        return threadPoolSize != null ? threadPoolSize : 2;
-    }
-
     protected TransportStrategy resolveTransportStrategy() {
         return this.transportStrategy != null ? this.transportStrategy : TransportStrategy.SMTP;
     }
@@ -134,5 +146,14 @@ public class MailerFactory {
 
     protected Map<String, String> resolveJavamailProperties() {
         return this.javamailProperties != null ? this.javamailProperties : Collections.emptyMap();
+    }
+
+    protected int resolveThreadPoolSize() {
+        // default value in SJM is 10.. I suppose we don't need such a big pool for most cases
+        return threadPoolSize != null ? threadPoolSize : 2;
+    }
+
+    protected int resolveThreadPoolKeepAliveTimeMs() {
+        return threadPoolKeepAliveTime != null ? (int) threadPoolKeepAliveTime.getDuration().toMillis() : 10;
     }
 }
