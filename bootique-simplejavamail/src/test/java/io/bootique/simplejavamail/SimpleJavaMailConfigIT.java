@@ -81,6 +81,7 @@ public class SimpleJavaMailConfigIT {
     @DisplayName("Explicit values to all supported config properties")
     public void testMailer_FullConfig() {
         BQRuntime runtime = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpServer", "example.org"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "11111"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.username", "un"))
@@ -91,7 +92,7 @@ public class SimpleJavaMailConfigIT {
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolExpireAfter", "12 sec"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolClaimTimeout", "1 min"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolCoreSize", "2"))
-                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolMaxSzie", "6"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.connectionPoolMaxSize", "6"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.transportStrategy", "SMTPS"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.javamailProperties.x", "yz"))
@@ -100,6 +101,9 @@ public class SimpleJavaMailConfigIT {
 
         Mailer mailer = runtime.getInstance(Mailers.class).getMailer("x");
         assertNotNull(mailer);
+
+        assertFalse(mailer.getOperationalConfig().isTransportModeLoggingOnly());
+
         assertEquals("example.org", mailer.getServerConfig().getHost());
         assertEquals(11111, mailer.getServerConfig().getPort());
         assertEquals("un", mailer.getServerConfig().getUsername());

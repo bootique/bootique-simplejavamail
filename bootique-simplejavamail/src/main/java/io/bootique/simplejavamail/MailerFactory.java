@@ -193,7 +193,7 @@ public class MailerFactory {
     }
 
     protected int resolveConnectionPoolCoreSize() {
-        return connectionPoolCoreSize != null ? connectionPoolMaxSize : 0;
+        return connectionPoolCoreSize != null ? connectionPoolCoreSize : 0;
     }
 
     protected int resolveConnectionPoolMaxSize() {
