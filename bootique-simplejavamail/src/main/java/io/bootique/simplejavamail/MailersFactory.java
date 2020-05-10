@@ -20,6 +20,7 @@ package io.bootique.simplejavamail;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.shutdown.ShutdownManager;
 import org.simplejavamail.api.mailer.Mailer;
 
 import java.util.Collections;
@@ -35,9 +36,10 @@ public class MailersFactory {
     private Map<String, MailerFactory> mailers;
     private Boolean disabled;
 
-    public Mailers createMailers() {
-        Map<String, Mailer> resolvedMailers = resolveMailers();
-        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers);
+    public Mailers createMailers(ShutdownManager shutdownManager) {
+        boolean disabled = resolveDisabled();
+        Map<String, Mailer> resolvedMailers = resolveMailers(disabled, shutdownManager);
+        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers, disabled, shutdownManager);
         return new DefaultMailers(resolvedMailers, defaultMailer);
     }
 
@@ -52,11 +54,11 @@ public class MailersFactory {
         this.disabled = disabled;
     }
 
-    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers) {
+    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers, boolean disabled, ShutdownManager shutdownManager) {
         switch (resolvedMailers.size()) {
             case 0:
                 // provide an implicitly-configured default mailer
-                return new MailerFactory().createMailer(resolveDisabled());
+                return new MailerFactory().createMailer(disabled, shutdownManager);
             case 1:
                 return resolvedMailers.values().iterator().next();
             default:
@@ -64,15 +66,14 @@ public class MailersFactory {
         }
     }
 
-    protected Map<String, Mailer> resolveMailers() {
+    protected Map<String, Mailer> resolveMailers(boolean disabled, ShutdownManager shutdownManager) {
 
         if (mailers == null || mailers.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        boolean disabled = resolveDisabled();
         Map<String, Mailer> resolved = new HashMap<>();
-        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(disabled)));
+        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(disabled, shutdownManager)));
         return resolved;
     }
 

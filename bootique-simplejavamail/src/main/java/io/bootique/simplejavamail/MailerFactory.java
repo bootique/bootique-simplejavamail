@@ -20,6 +20,7 @@ package io.bootique.simplejavamail;
 
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
+import io.bootique.shutdown.ShutdownManager;
 import io.bootique.value.Duration;
 import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
@@ -55,7 +56,7 @@ public class MailerFactory {
 
     // TODO: proxy settings, etc.
 
-    public Mailer createMailer(boolean disabled) {
+    public Mailer createMailer(boolean disabled, ShutdownManager shutdownManager) {
 
         MailerRegularBuilderImpl builder = MailerBuilder
                 .withSMTPServer(resolveSmtpServer(), resolveSmtpPort())
@@ -80,7 +81,9 @@ public class MailerFactory {
             builder.clearEmailAddressCriteria();
         }
 
-        return builder.buildMailer();
+        Mailer mailer = builder.buildMailer();
+        shutdownManager.addShutdownHook(() -> mailer.shutdownConnectionPool());
+        return mailer;
     }
 
     @BQConfigProperty("SMTP server used for mail delivery. '127.0.0.1' by default")
