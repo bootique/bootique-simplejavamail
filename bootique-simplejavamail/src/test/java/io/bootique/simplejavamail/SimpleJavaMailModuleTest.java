@@ -1,6 +1,6 @@
 package io.bootique.simplejavamail;
 
-import io.bootique.test.junit5.BQModuleProviderChecker;
+import io.bootique.junit5.BQModuleProviderChecker;
 import org.junit.jupiter.api.Test;
 
 public class SimpleJavaMailModuleTest {

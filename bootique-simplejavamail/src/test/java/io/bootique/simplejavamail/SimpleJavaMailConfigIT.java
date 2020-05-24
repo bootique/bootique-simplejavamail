@@ -20,7 +20,7 @@ package io.bootique.simplejavamail;
 
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
-import io.bootique.test.junit5.BQTestFactory;
+import io.bootique.junit5.BQTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
