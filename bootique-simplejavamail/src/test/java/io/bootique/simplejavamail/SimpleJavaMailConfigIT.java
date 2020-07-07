@@ -20,10 +20,11 @@ package io.bootique.simplejavamail;
 
 import io.bootique.BQCoreModule;
 import io.bootique.BQRuntime;
+import io.bootique.junit5.BQTest;
 import io.bootique.junit5.BQTestFactory;
+import io.bootique.junit5.BQTestTool;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
 
@@ -35,10 +36,11 @@ import java.util.concurrent.TimeUnit;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.*;
 
+@BQTest
 public class SimpleJavaMailConfigIT {
 
-    @RegisterExtension
-    public BQTestFactory testFactory = new BQTestFactory().autoLoadModules();
+    @BQTestTool
+    final BQTestFactory testFactory = new BQTestFactory().autoLoadModules();
 
     @Test
     public void testMailer_NoConfig() {

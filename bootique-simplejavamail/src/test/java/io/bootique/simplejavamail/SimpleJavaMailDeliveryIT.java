@@ -21,7 +21,9 @@ package io.bootique.simplejavamail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 import io.bootique.BQCoreModule;
+import io.bootique.junit5.BQTest;
 import io.bootique.junit5.BQTestFactory;
+import io.bootique.junit5.BQTestTool;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -36,13 +38,14 @@ import javax.mail.internet.MimeMessage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@BQTest
 public class SimpleJavaMailDeliveryIT {
 
     @RegisterExtension
-    public static final GreenMailExtension mailboxManager = new GreenMailExtension(new ServerSetup(5025, null, ServerSetup.PROTOCOL_SMTP));
+    static final GreenMailExtension mailboxManager = new GreenMailExtension(new ServerSetup(5025, null, ServerSetup.PROTOCOL_SMTP));
 
-    @RegisterExtension
-    public BQTestFactory testFactory = new BQTestFactory().autoLoadModules();
+    @BQTestTool
+    final BQTestFactory testFactory = new BQTestFactory().autoLoadModules();
 
     @Test
     @DisplayName("Delivery with (almost) default config")
