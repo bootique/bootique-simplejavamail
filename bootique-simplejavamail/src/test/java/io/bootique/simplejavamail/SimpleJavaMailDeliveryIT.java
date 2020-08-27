@@ -18,6 +18,7 @@
  */
 package io.bootique.simplejavamail;
 
+import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 import io.bootique.BQCoreModule;
@@ -42,7 +43,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SimpleJavaMailDeliveryIT {
 
     @RegisterExtension
-    static final GreenMailExtension mailboxManager = new GreenMailExtension(new ServerSetup(5025, null, ServerSetup.PROTOCOL_SMTP));
+    static final GreenMailExtension mailboxManager =
+            new GreenMailExtension(new ServerSetup(5025, null, ServerSetup.PROTOCOL_SMTP));
 
     @BQTestTool
     final BQTestFactory testFactory = new BQTestFactory().autoLoadModules();
@@ -187,7 +189,7 @@ public class SimpleJavaMailDeliveryIT {
         // TODO: oddly enough with the addition of the batch module, sync delivery still requires waiting on the
         //  Greenmail end.. Is it truly sync?
         assertTrue(mailboxManager.waitForIncomingEmail(500, 1));
-        MimeMessage[] received = mailboxManager.getGreenMail().getReceivedMessages();
+        MimeMessage[] received = mailboxManager.getReceivedMessages();
         assertEquals(1, received.length);
         return received[0];
     }
@@ -195,7 +197,7 @@ public class SimpleJavaMailDeliveryIT {
     private MimeMessage sendAsync(Email email, Mailer mailer) {
         mailer.sendMail(email, true);
         assertTrue(mailboxManager.waitForIncomingEmail(500, 1));
-        MimeMessage[] received = mailboxManager.getGreenMail().getReceivedMessages();
+        MimeMessage[] received = mailboxManager.getReceivedMessages();
         assertEquals(1, received.length);
         return received[0];
     }

@@ -21,7 +21,7 @@
     <properties>
         <bootique.version>${project.version}</bootique.version>
         <simplejavamail.version>6.0.4</simplejavamail.version>
-        <greenmail.version>1.5.13</greenmail.version>
+        <greenmail.version>1.6.0</greenmail.version>
     </properties>
 
     <modules>
@@ -66,7 +66,7 @@
             </dependency>
             <dependency>
                 <groupId>com.icegreen</groupId>
-                <artifactId>greenmail</artifactId>
+                <artifactId>greenmail-junit5</artifactId>
                 <version>${greenmail.version}</version>
             </dependency>
         </dependencies>
