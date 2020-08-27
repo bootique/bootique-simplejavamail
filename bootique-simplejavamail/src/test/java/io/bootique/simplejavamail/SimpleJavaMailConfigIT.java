@@ -78,7 +78,7 @@ public class SimpleJavaMailConfigIT {
         assertEquals(new HashSet<>(asList("x", "y")), new HashSet<>(mailers.getMailerNames()));
         assertNotNull(mailers.getMailer("x"));
         assertNotNull(mailers.getMailer("y"));
-        assertThrows(IllegalStateException.class, () -> mailers.getDefaultMailer());
+        assertThrows(IllegalStateException.class, mailers::getDefaultMailer);
     }
 
     @Test
@@ -108,6 +108,7 @@ public class SimpleJavaMailConfigIT {
 
         assertFalse(mailer.getOperationalConfig().isTransportModeLoggingOnly());
 
+        assertNotNull(mailer.getServerConfig());
         assertEquals("example.org", mailer.getServerConfig().getHost());
         assertEquals(11111, mailer.getServerConfig().getPort());
         assertEquals("un", mailer.getServerConfig().getUsername());
