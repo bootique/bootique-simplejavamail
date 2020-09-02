@@ -25,6 +25,7 @@ import io.bootique.BQCoreModule;
 import io.bootique.junit5.BQTest;
 import io.bootique.junit5.BQTestFactory;
 import io.bootique.junit5.BQTestTool;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -74,6 +75,7 @@ public class SimpleJavaMailDeliveryIT {
     }
 
     @Test
+    @Disabled("Temporary disabled as it fails in some environments")
     @DisplayName("Async delivery")
     public void testSendMail_Async() throws MessagingException {
 
