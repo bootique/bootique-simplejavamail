@@ -60,6 +60,12 @@
                 <groupId>com.icegreen</groupId>
                 <artifactId>greenmail-junit5</artifactId>
                 <version>${greenmail.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.junit.jupiter</groupId>
+                        <artifactId>junit-jupiter-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>
