@@ -19,8 +19,9 @@
 package io.bootique.simplejavamail;
 
 import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.user.GreenMailUser;
 import com.icegreen.greenmail.util.GreenMailUtil;
-import com.icegreen.greenmail.util.ServerSetup;
+import com.icegreen.greenmail.util.ServerSetupTest;
 import io.bootique.BQCoreModule;
 import io.bootique.junit5.BQTest;
 import io.bootique.junit5.BQTestFactory;
@@ -34,8 +35,7 @@ import org.simplejavamail.api.email.Email;
 import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.email.EmailBuilder;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
+import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,8 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SimpleJavaMailDeliveryIT {
 
     @RegisterExtension
-    static final GreenMailExtension mailboxManager =
-            new GreenMailExtension(new ServerSetup(5025, null, ServerSetup.PROTOCOL_SMTP));
+    static final GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP_IMAP);
 
     @BQTestTool
     final BQTestFactory testFactory = new BQTestFactory().autoLoadModules();
@@ -56,7 +55,7 @@ public class SimpleJavaMailDeliveryIT {
 
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
-                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
                 .createRuntime()
                 .getInstance(Mailers.class);
 
@@ -81,7 +80,7 @@ public class SimpleJavaMailDeliveryIT {
 
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
-                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
                 .createRuntime()
                 .getInstance(Mailers.class);
 
@@ -104,7 +103,7 @@ public class SimpleJavaMailDeliveryIT {
     public void testSendMail_validateEmailsOn() {
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
-                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
                 // 'true' is the default
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "true"))
                 .createRuntime()
@@ -125,7 +124,7 @@ public class SimpleJavaMailDeliveryIT {
     public void testSendMail_validateEmailsOff() throws MessagingException {
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
-                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.validateEmails", "false"))
                 .createRuntime()
                 .getInstance(Mailers.class);
@@ -150,7 +149,7 @@ public class SimpleJavaMailDeliveryIT {
     public void testSendMail_Disabled() {
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "true"))
-                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
                 .createRuntime()
                 .getInstance(Mailers.class);
 
@@ -162,14 +161,14 @@ public class SimpleJavaMailDeliveryIT {
                 .buildEmail();
 
         mailers.getDefaultMailer().sendMail(email, false);
-        assertFalse(mailboxManager.waitForIncomingEmail(500, 1), "Email unexpected in 'disabled' mode");
+        assertFalse(greenMail.waitForIncomingEmail(500, 1), "Email unexpected in 'disabled' mode");
     }
 
     @Test
     @DisplayName("'disabled' on by default")
     public void testSendMail_Disabled_Default() {
         Mailers mailers = testFactory.app()
-                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "5025"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
                 .createRuntime()
                 .getInstance(Mailers.class);
 
@@ -181,25 +180,76 @@ public class SimpleJavaMailDeliveryIT {
                 .buildEmail();
 
         mailers.getDefaultMailer().sendMail(email, false);
-        assertFalse(mailboxManager.waitForIncomingEmail(500, 1), "Email unexpected in 'disabled' mode");
+        assertFalse(greenMail.waitForIncomingEmail(500, 1), "Email unexpected in 'disabled' mode");
     }
 
+    @Test
+    @DisplayName("'recipientOverride'")
+    public void testSendMail_RecipientOverride() throws MessagingException {
+
+        GreenMailUser x = greenMail.setUser("x@example.org", "x", "secret");
+        GreenMailUser z = greenMail.setUser("z@example.org", "z", "secret");
+
+        Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.recipientOverrides", "z@example.org"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
+                .createRuntime()
+                .getInstance(Mailers.class);
+
+        Email email = EmailBuilder.startingBlank()
+                .from("y@example.org")
+                .to("x@example.org")
+                .withSubject("test subject")
+                .withPlainText("test body")
+                .buildEmail();
+
+        sendSyncNoRetrieve(email, mailers.getDefaultMailer());
+
+        // must be delivered to the override address, but "To" address must be preserved..
+
+        assertNull(readFirst(x), "Was still delivered to the original address");
+        MimeMessage message = readFirst(z);
+        assertNotNull(message, "Was not delivered to the override address");
+
+        assertEquals("y@example.org", message.getFrom()[0].toString());
+        assertEquals("x@example.org", message.getRecipients(Message.RecipientType.TO)[0].toString());
+        assertEquals("test subject", message.getSubject());
+        assertEquals("test body", GreenMailUtil.getBody(message));
+    }
+
+    private MimeMessage readFirst(GreenMailUser user) throws MessagingException {
+        Session imapSession = greenMail.getImap().createSession();
+        Store store = imapSession.getStore("imap");
+        store.connect(user.getLogin(), user.getPassword());
+        Folder inbox = store.getFolder("INBOX");
+        inbox.open(Folder.READ_ONLY);
+        return inbox.getMessageCount() == 0 ? null : (MimeMessage) inbox.getMessage(1);
+    }
 
     private MimeMessage sendSync(Email email, Mailer mailer) {
         mailer.sendMail(email, false);
 
         // TODO: oddly enough with the addition of the batch module, sync delivery still requires waiting on the
         //  Greenmail end.. Is it truly sync?
-        assertTrue(mailboxManager.waitForIncomingEmail(500, 1));
-        MimeMessage[] received = mailboxManager.getReceivedMessages();
+        assertTrue(greenMail.waitForIncomingEmail(500, 1));
+        MimeMessage[] received = greenMail.getReceivedMessages();
         assertEquals(1, received.length);
         return received[0];
     }
 
+    private void sendSyncNoRetrieve(Email email, Mailer mailer) {
+        mailer.sendMail(email, false);
+
+        // TODO: oddly enough with the addition of the batch module, sync delivery still requires waiting on the
+        //  Greenmail end.. Is it truly sync?
+        assertTrue(greenMail.waitForIncomingEmail(500, 1));
+    }
+
     private MimeMessage sendAsync(Email email, Mailer mailer) {
         mailer.sendMail(email, true);
-        assertTrue(mailboxManager.waitForIncomingEmail(500, 1));
-        MimeMessage[] received = mailboxManager.getReceivedMessages();
+        assertTrue(greenMail.waitForIncomingEmail(500, 1));
+        MimeMessage[] received = greenMail.getReceivedMessages();
         assertEquals(1, received.length);
         return received[0];
     }

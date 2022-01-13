@@ -21,6 +21,7 @@ package io.bootique.simplejavamail;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.shutdown.ShutdownManager;
+import org.simplejavamail.api.mailer.CustomMailer;
 import org.simplejavamail.api.mailer.Mailer;
 
 import java.util.Collections;
@@ -35,11 +36,14 @@ public class MailersFactory {
 
     private Map<String, MailerFactory> mailers;
     private Boolean disabled;
+    private Emails recipientOverrides;
 
     public Mailers createMailers(ShutdownManager shutdownManager) {
+        CustomMailer customMailer = resolveRecipientOverrides();
         boolean disabled = resolveDisabled();
-        Map<String, Mailer> resolvedMailers = resolveMailers(disabled, shutdownManager);
-        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers, disabled, shutdownManager);
+
+        Map<String, Mailer> resolvedMailers = resolveMailers(customMailer, disabled, shutdownManager);
+        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers, customMailer, disabled, shutdownManager);
         return new DefaultMailers(resolvedMailers, defaultMailer);
     }
 
@@ -54,11 +58,21 @@ public class MailersFactory {
         this.disabled = disabled;
     }
 
-    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers, boolean disabled, ShutdownManager shutdownManager) {
+    /**
+     * @since 3.0.M1
+     */
+    @BQConfigProperty("A comma-separated list of special email addresses. If set (and delivery is enabled), these " +
+            "addresses will be used to deliver messages, ignoring (but not altering) 'to:', 'cc:' or 'bcc:'. " +
+            "Used for testing email delivery.")
+    public void setRecipientOverrides(Emails recipientOverrides) {
+        this.recipientOverrides = recipientOverrides;
+    }
+
+    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers, CustomMailer customMailer, boolean disabled, ShutdownManager shutdownManager) {
         switch (resolvedMailers.size()) {
             case 0:
                 // provide an implicitly-configured default mailer
-                return new MailerFactory().createMailer(disabled, shutdownManager);
+                return new MailerFactory().createMailer(customMailer, disabled, shutdownManager);
             case 1:
                 return resolvedMailers.values().iterator().next();
             default:
@@ -66,19 +80,23 @@ public class MailersFactory {
         }
     }
 
-    protected Map<String, Mailer> resolveMailers(boolean disabled, ShutdownManager shutdownManager) {
+    protected Map<String, Mailer> resolveMailers(CustomMailer customMailer, boolean disabled, ShutdownManager shutdownManager) {
 
         if (mailers == null || mailers.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, Mailer> resolved = new HashMap<>();
-        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(disabled, shutdownManager)));
+        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(customMailer, disabled, shutdownManager)));
         return resolved;
     }
 
     protected boolean resolveDisabled() {
         // by default all Mailers are disabled to prevent delivery in non-production environments
         return this.disabled != null ? this.disabled : true;
+    }
+
+    protected CustomMailer resolveRecipientOverrides() {
+        return recipientOverrides != null ? new MailerWithOverriddenRecipients(recipientOverrides.getEmails()) : null;
     }
 }

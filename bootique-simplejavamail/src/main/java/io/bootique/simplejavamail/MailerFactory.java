@@ -22,6 +22,7 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.shutdown.ShutdownManager;
 import io.bootique.value.Duration;
+import org.simplejavamail.api.mailer.CustomMailer;
 import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
 import org.simplejavamail.mailer.MailerBuilder;
@@ -56,7 +57,7 @@ public class MailerFactory {
 
     // TODO: proxy settings, etc.
 
-    public Mailer createMailer(boolean disabled, ShutdownManager shutdownManager) {
+    public Mailer createMailer(CustomMailer customMailer, boolean disabled, ShutdownManager shutdownManager) {
 
         MailerRegularBuilderImpl builder = MailerBuilder
                 .withSMTPServer(resolveSmtpServer(), resolveSmtpPort())
@@ -79,6 +80,10 @@ public class MailerFactory {
 
         if (!resolveValidateEmails()) {
             builder.clearEmailAddressCriteria();
+        }
+
+        if (customMailer != null) {
+            builder.withCustomMailer(customMailer);
         }
 
         Mailer mailer = builder.buildMailer();
