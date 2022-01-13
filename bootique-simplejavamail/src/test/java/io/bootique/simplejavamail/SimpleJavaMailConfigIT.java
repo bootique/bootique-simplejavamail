@@ -128,7 +128,7 @@ public class SimpleJavaMailConfigIT {
         assertEquals(6, mailer.getOperationalConfig().getConnectionPoolMaxSize());
 
         assertEquals(TransportStrategy.SMTPS, mailer.getTransportStrategy());
-        assertTrue(mailer.getEmailAddressCriteria().isEmpty());
+        assertTrue(mailer.getEmailGovernance().getEmailAddressCriteria().isEmpty());
 
         assertEquals("yz", mailer.getSession().getProperty("x"));
     }
