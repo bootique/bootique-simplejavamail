@@ -20,7 +20,7 @@
 
     <properties>
         <bootique.version>${project.version}</bootique.version>
-        <simplejavamail.version>6.7.5</simplejavamail.version>
+        <simplejavamail.version>6.7.6</simplejavamail.version>
         <greenmail.version>1.6.0</greenmail.version>
     </properties>
 
