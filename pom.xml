@@ -20,12 +20,15 @@
 
     <properties>
         <bootique.version>${project.version}</bootique.version>
-        <simplejavamail.version>6.7.6</simplejavamail.version>
-        <greenmail.version>1.6.0</greenmail.version>
+        <simplejavamail6.version>6.7.6</simplejavamail6.version>
+        <simplejavamail7.version>7.4.0</simplejavamail7.version>
+        <greenmail1.version>1.6.9</greenmail1.version>
+        <greenmail2.version>2.0.0-alpha-2</greenmail2.version>
     </properties>
 
     <modules>
         <module>bootique-simplejavamail</module>
+        <module>bootique-simplejavamail-jakarta</module>
     </modules>
 
     <scm>
@@ -37,16 +40,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.simplejavamail</groupId>
-                <artifactId>simple-java-mail</artifactId>
-                <version>${simplejavamail.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.simplejavamail</groupId>
-                <artifactId>batch-module</artifactId>
-                <version>${simplejavamail.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.bootique</groupId>
                 <artifactId>bootique</artifactId>
                 <version>${bootique.version}</version>
@@ -55,17 +48,6 @@
                 <groupId>io.bootique</groupId>
                 <artifactId>bootique-junit5</artifactId>
                 <version>${bootique.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.icegreen</groupId>
-                <artifactId>greenmail-junit5</artifactId>
-                <version>${greenmail.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.junit.jupiter</groupId>
-                        <artifactId>junit-jupiter-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>

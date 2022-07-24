@@ -6,24 +6,41 @@
         <artifactId>bootique-simplejavamail-parent</artifactId>
         <version>3.0.M1-SNAPSHOT</version>
     </parent>
-    <artifactId>bootique-simplejavamail</artifactId>
+    <artifactId>bootique-simplejavamail-jakarta</artifactId>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.simplejavamail</groupId>
                 <artifactId>simple-java-mail</artifactId>
-                <version>${simplejavamail6.version}</version>
+                <version>${simplejavamail7.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.simplejavamail</groupId>
                 <artifactId>batch-module</artifactId>
-                <version>${simplejavamail6.version}</version>
+                <version>${simplejavamail7.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.icegreen</groupId>
                 <artifactId>greenmail-junit5</artifactId>
-                <version>${greenmail1.version}</version>
+                <version>${greenmail2.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.junit.jupiter</groupId>
@@ -46,6 +63,10 @@
         <dependency>
             <groupId>org.simplejavamail</groupId>
             <artifactId>batch-module</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <!-- Unit test dependencies -->
