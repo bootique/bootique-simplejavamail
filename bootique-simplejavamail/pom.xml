@@ -14,11 +14,23 @@
                 <groupId>org.simplejavamail</groupId>
                 <artifactId>simple-java-mail</artifactId>
                 <version>${simplejavamail6.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.simplejavamail</groupId>
                 <artifactId>batch-module</artifactId>
                 <version>${simplejavamail6.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.icegreen</groupId>
@@ -28,6 +40,10 @@
                     <exclusion>
                         <groupId>org.junit.jupiter</groupId>
                         <artifactId>junit-jupiter-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -46,6 +62,10 @@
         <dependency>
             <groupId>org.simplejavamail</groupId>
             <artifactId>batch-module</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <!-- Unit test dependencies -->
