@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.bootique.simplejavamail</groupId>
         <artifactId>bootique-simplejavamail-parent</artifactId>
-        <version>3.0.M2-SNAPSHOT</version>
+        <version>3.0.M2</version>
     </parent>
     <artifactId>bootique-simplejavamail-jakarta</artifactId>
 
