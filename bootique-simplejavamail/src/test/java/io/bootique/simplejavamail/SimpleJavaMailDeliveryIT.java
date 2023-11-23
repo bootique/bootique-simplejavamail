@@ -51,7 +51,7 @@ public class SimpleJavaMailDeliveryIT {
 
     @Test
     @DisplayName("Delivery with (almost) default config")
-    public void testSendMail() throws MessagingException {
+    public void sendMail() throws MessagingException {
 
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
@@ -76,7 +76,7 @@ public class SimpleJavaMailDeliveryIT {
     @Test
     @Disabled("Temporary disabled as it fails in some environments")
     @DisplayName("Async delivery")
-    public void testSendMail_Async() throws MessagingException {
+    public void sendMail_Async() throws MessagingException {
 
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
@@ -100,7 +100,7 @@ public class SimpleJavaMailDeliveryIT {
 
     @Test
     @DisplayName("'validateEmails' on")
-    public void testSendMail_validateEmailsOn() {
+    public void sendMail_validateEmailsOn() {
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
@@ -121,7 +121,7 @@ public class SimpleJavaMailDeliveryIT {
 
     @Test
     @DisplayName("'validateEmails' off")
-    public void testSendMail_validateEmailsOff() throws MessagingException {
+    public void sendMail_validateEmailsOff() throws MessagingException {
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
@@ -146,7 +146,7 @@ public class SimpleJavaMailDeliveryIT {
 
     @Test
     @DisplayName("'disabled'")
-    public void testSendMail_Disabled() {
+    public void sendMail_Disabled() {
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "true"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
@@ -166,7 +166,7 @@ public class SimpleJavaMailDeliveryIT {
 
     @Test
     @DisplayName("'disabled' on by default")
-    public void testSendMail_Disabled_Default() {
+    public void sendMail_Disabled_Default() {
         Mailers mailers = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
                 .createRuntime()
@@ -185,7 +185,7 @@ public class SimpleJavaMailDeliveryIT {
 
     @Test
     @DisplayName("'recipientOverride'")
-    public void testSendMail_RecipientOverride() throws MessagingException {
+    public void sendMail_RecipientOverride() throws MessagingException {
 
         GreenMailUser x = greenMail.setUser("x@example.org", "x", "secret");
         GreenMailUser z = greenMail.setUser("z@example.org", "z", "secret");
