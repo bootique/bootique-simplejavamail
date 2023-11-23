@@ -44,7 +44,7 @@ public class MailerWithOverriddenRecipients implements CustomMailer {
     }
 
     @Override
-    public void connection(OperationalConfig operationalConfig, Session session) {
+    public void testConnection(OperationalConfig operationalConfig, Session session) {
         try {
             // doing the same as TestConnectionClosure
             TransportRunner.connect(operationalConfig.getClusterKey(), session);

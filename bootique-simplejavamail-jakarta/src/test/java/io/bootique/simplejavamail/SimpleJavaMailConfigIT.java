@@ -83,7 +83,7 @@ public class SimpleJavaMailConfigIT {
 
     @Test
     @DisplayName("Explicit values to all supported config properties")
-    public void mailer_FullConfig() {
+    public void testMailer_FullConfig() {
         BQRuntime runtime = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpServer", "example.org"))
