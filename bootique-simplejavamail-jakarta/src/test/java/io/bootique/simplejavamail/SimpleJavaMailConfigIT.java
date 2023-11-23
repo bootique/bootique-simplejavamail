@@ -43,7 +43,7 @@ public class SimpleJavaMailConfigIT {
     final BQTestFactory testFactory = new BQTestFactory().autoLoadModules();
 
     @Test
-    public void testMailer_NoConfig() {
+    public void mailer_NoConfig() {
         BQRuntime runtime = testFactory.app().createRuntime();
         Mailers mailers = runtime.getInstance(Mailers.class);
 
@@ -52,7 +52,7 @@ public class SimpleJavaMailConfigIT {
     }
 
     @Test
-    public void testMailer_SingleConfig() {
+    public void mailer_SingleConfig() {
         BQRuntime runtime = testFactory.app()
                 .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpServer", "example.org"))
                 .createRuntime();
@@ -66,7 +66,7 @@ public class SimpleJavaMailConfigIT {
     }
 
     @Test
-    public void testMailer_MultiConfig() {
+    public void mailer_MultiConfig() {
         BQRuntime runtime = testFactory.app()
                 .module(b -> BQCoreModule.extend(b)
                         .setProperty("bq.simplejavamail.mailers.x.smtpServer", "example.org")
