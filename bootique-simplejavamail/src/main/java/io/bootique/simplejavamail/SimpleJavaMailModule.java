@@ -20,7 +20,7 @@ public class SimpleJavaMailModule extends ConfigModule implements BQModuleProvid
     public BuiltModule buildModule() {
         return BuiltModule.of(this)
                 .provider(this)
-                .description("Deprecated and can be replaced with 'bootique-simplejavamail-jakarta'.")
+                .description("Deprecated, can be replaced with 'bootique-simplejavamail-jakarta'.")
                 .config(configPrefix, MailersFactory.class)
                 .build();
     }
