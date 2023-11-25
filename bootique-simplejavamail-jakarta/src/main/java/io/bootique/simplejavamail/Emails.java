@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * A configuration value object that represents a comma-separated list of emails following RFC822 syntax.
  *
- * @since 3.0.M1
+ * @since 3.0
  */
 public class Emails {
 

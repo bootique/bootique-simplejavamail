@@ -59,7 +59,7 @@ public class MailersFactory {
     }
 
     /**
-     * @since 3.0.M1
+     * @since 3.0
      */
     @BQConfigProperty("A comma-separated list of special email addresses. If set (and delivery is enabled), these " +
             "addresses will be used to deliver messages, ignoring (but not altering) 'to:', 'cc:' or 'bcc:'. " +
