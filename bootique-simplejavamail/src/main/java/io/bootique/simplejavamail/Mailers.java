@@ -26,7 +26,9 @@ import java.util.Collection;
  * A holder of one or more preconfigured named {@link org.simplejavamail.api.mailer.Mailer} mailers.
  *
  * @since 2.0
+ * @deprecated in favor of the Jakarta flavor
  */
+@Deprecated(since = "3.0", forRemoval = true)
 public interface Mailers {
 
     Mailer getMailer(String name);

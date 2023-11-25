@@ -33,6 +33,10 @@ import java.util.Objects;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+/**
+ * @deprecated in favor of the Jakarta flavor
+ */
+@Deprecated(since = "3.0", forRemoval = true)
 public class MailerWithOverriddenRecipients implements CustomMailer {
 
     static final Logger LOGGER = getLogger(MailerWithOverriddenRecipients.class);

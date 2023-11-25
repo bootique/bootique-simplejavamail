@@ -27,7 +27,9 @@ import java.util.Objects;
  * A configuration value object that represents a comma-separated list of emails following RFC822 syntax.
  *
  * @since 3.0
+ * @deprecated in favor of the Jakarta flavor
  */
+@Deprecated(since = "3.0", forRemoval = true)
 public class Emails {
 
     private final InternetAddress[] emails;

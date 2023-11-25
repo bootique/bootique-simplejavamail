@@ -1,3 +1,7 @@
+## 3.0-M3
+
+* #6 (Jakarta migration) Deprecate the "javax" module
+
 ## 3.0.M1
 
 * #1 Support "recipientOverride" setting

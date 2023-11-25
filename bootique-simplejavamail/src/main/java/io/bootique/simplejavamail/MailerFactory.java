@@ -33,7 +33,9 @@ import java.util.Map;
 
 /**
  * @since 2.0
+ * @deprecated in favor of the Jakarta flavor
  */
+@Deprecated(since = "3.0", forRemoval = true)
 @BQConfig
 public class MailerFactory {
 
