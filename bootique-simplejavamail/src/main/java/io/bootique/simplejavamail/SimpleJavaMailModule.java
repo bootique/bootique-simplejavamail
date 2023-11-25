@@ -4,7 +4,6 @@ import io.bootique.BQModuleProvider;
 import io.bootique.ConfigModule;
 import io.bootique.bootstrap.BuiltModule;
 import io.bootique.config.ConfigurationFactory;
-import io.bootique.di.Binder;
 import io.bootique.di.Provides;
 import io.bootique.shutdown.ShutdownManager;
 
@@ -19,11 +18,11 @@ public class SimpleJavaMailModule extends ConfigModule implements BQModuleProvid
 
     @Override
     public BuiltModule buildModule() {
-        return BuiltModule.of(this).provider(this).config(configPrefix, MailersFactory.class).build();
-    }
-
-    @Override
-    public void configure(Binder binder) {
+        return BuiltModule.of(this)
+                .provider(this)
+                .description("Deprecated and can be replaced with 'bootique-simplejavamail-jakarta'.")
+                .config(configPrefix, MailersFactory.class)
+                .build();
     }
 
     @Singleton
