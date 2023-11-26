@@ -2,7 +2,7 @@ package io.bootique.simplejavamail;
 
 import io.bootique.BQModuleProvider;
 import io.bootique.ConfigModule;
-import io.bootique.bootstrap.BuiltModule;
+import io.bootique.ModuleCrate;
 import io.bootique.config.ConfigurationFactory;
 import io.bootique.di.Provides;
 import io.bootique.shutdown.ShutdownManager;
@@ -17,8 +17,8 @@ import javax.inject.Singleton;
 public class SimpleJavaMailModule extends ConfigModule implements BQModuleProvider {
 
     @Override
-    public BuiltModule buildModule() {
-        return BuiltModule.of(this)
+    public ModuleCrate moduleCrate() {
+        return ModuleCrate.of(this)
                 .provider(this)
                 .description("Deprecated, can be replaced with 'bootique-simplejavamail-jakarta'.")
                 .config(configPrefix, MailersFactory.class)
