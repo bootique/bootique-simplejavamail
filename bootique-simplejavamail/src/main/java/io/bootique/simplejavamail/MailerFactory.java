@@ -89,8 +89,7 @@ public class MailerFactory {
         }
 
         Mailer mailer = builder.buildMailer();
-        shutdownManager.addShutdownHook(() -> mailer.shutdownConnectionPool());
-        return mailer;
+        return shutdownManager.onShutdown(mailer, Mailer::shutdownConnectionPool);
     }
 
     @BQConfigProperty("SMTP server used for mail delivery. '127.0.0.1' by default")
