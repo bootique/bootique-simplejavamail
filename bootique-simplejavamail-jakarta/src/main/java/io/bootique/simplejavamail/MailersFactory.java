@@ -24,6 +24,7 @@ import io.bootique.shutdown.ShutdownManager;
 import org.simplejavamail.api.mailer.CustomMailer;
 import org.simplejavamail.api.mailer.Mailer;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,16 +35,23 @@ import java.util.Map;
 @BQConfig("Configuration of mailers collection")
 public class MailersFactory {
 
+    private final ShutdownManager shutdownManager;
+
     private Map<String, MailerFactory> mailers;
     private Boolean disabled;
     private Emails recipientOverrides;
 
-    public Mailers createMailers(ShutdownManager shutdownManager) {
+    @Inject
+    public MailersFactory(ShutdownManager shutdownManager) {
+        this.shutdownManager = shutdownManager;
+    }
+
+    public Mailers create() {
         CustomMailer customMailer = resolveRecipientOverrides();
         boolean disabled = resolveDisabled();
 
-        Map<String, Mailer> resolvedMailers = resolveMailers(customMailer, disabled, shutdownManager);
-        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers, customMailer, disabled, shutdownManager);
+        Map<String, Mailer> resolvedMailers = resolveMailers(customMailer, disabled);
+        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers, customMailer, disabled);
         return new DefaultMailers(resolvedMailers, defaultMailer);
     }
 
@@ -68,11 +76,11 @@ public class MailersFactory {
         this.recipientOverrides = recipientOverrides;
     }
 
-    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers, CustomMailer customMailer, boolean disabled, ShutdownManager shutdownManager) {
+    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers, CustomMailer customMailer, boolean disabled) {
         switch (resolvedMailers.size()) {
             case 0:
                 // provide an implicitly-configured default mailer
-                return new MailerFactory().createMailer(customMailer, disabled, shutdownManager);
+                return new MailerFactory(shutdownManager).createMailer(customMailer, disabled);
             case 1:
                 return resolvedMailers.values().iterator().next();
             default:
@@ -80,14 +88,14 @@ public class MailersFactory {
         }
     }
 
-    protected Map<String, Mailer> resolveMailers(CustomMailer customMailer, boolean disabled, ShutdownManager shutdownManager) {
+    protected Map<String, Mailer> resolveMailers(CustomMailer customMailer, boolean disabled) {
 
         if (mailers == null || mailers.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, Mailer> resolved = new HashMap<>();
-        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(customMailer, disabled, shutdownManager)));
+        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(customMailer, disabled)));
         return resolved;
     }
 

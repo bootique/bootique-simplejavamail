@@ -27,7 +27,7 @@ public class SimpleJavaMailModule implements BQModule {
 
     @Singleton
     @Provides
-    Mailers provideMailers(ConfigurationFactory configurationFactory, ShutdownManager shutdownManager) {
-        return configurationFactory.config(MailersFactory.class, CONFIG_PREFIX).createMailers(shutdownManager);
+    Mailers provideMailers(ConfigurationFactory configurationFactory) {
+        return configurationFactory.config(MailersFactory.class, CONFIG_PREFIX).create();
     }
 }

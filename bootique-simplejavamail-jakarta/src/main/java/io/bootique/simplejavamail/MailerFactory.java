@@ -28,6 +28,7 @@ import org.simplejavamail.api.mailer.config.TransportStrategy;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
 
@@ -36,6 +37,8 @@ import java.util.Map;
  */
 @BQConfig
 public class MailerFactory {
+
+    private final ShutdownManager shutdownManager;
 
     private String smtpServer;
     private Integer smtpPort;
@@ -57,7 +60,12 @@ public class MailerFactory {
 
     // TODO: proxy settings, etc.
 
-    public Mailer createMailer(CustomMailer customMailer, boolean disabled, ShutdownManager shutdownManager) {
+    @Inject
+    public MailerFactory(ShutdownManager shutdownManager) {
+        this.shutdownManager = shutdownManager;
+    }
+
+    public Mailer createMailer(CustomMailer customMailer, boolean disabled) {
 
         MailerRegularBuilderImpl builder = MailerBuilder
                 .withSMTPServer(resolveSmtpServer(), resolveSmtpPort())
