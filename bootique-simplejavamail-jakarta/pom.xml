@@ -13,7 +13,7 @@
             <dependency>
                 <groupId>org.simplejavamail</groupId>
                 <artifactId>simple-java-mail</artifactId>
-                <version>${simplejavamail7.version}</version>
+                <version>${simplejavamail8.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -24,7 +24,7 @@
             <dependency>
                 <groupId>org.simplejavamail</groupId>
                 <artifactId>batch-module</artifactId>
-                <version>${simplejavamail7.version}</version>
+                <version>${simplejavamail8.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>

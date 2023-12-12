@@ -22,14 +22,17 @@ import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.shutdown.ShutdownManager;
 import io.bootique.value.Duration;
-import org.simplejavamail.api.mailer.CustomMailer;
+import jakarta.mail.internet.InternetAddress;
+import org.simplejavamail.api.email.Recipient;
 import org.simplejavamail.api.mailer.Mailer;
 import org.simplejavamail.api.mailer.config.TransportStrategy;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.simplejavamail.mailer.internal.MailerRegularBuilderImpl;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -65,7 +68,7 @@ public class MailerFactory {
         this.shutdownManager = shutdownManager;
     }
 
-    public Mailer createMailer(CustomMailer customMailer, boolean disabled) {
+    public Mailer createMailer(Emails recipientOverrides, boolean disabled) {
 
         MailerRegularBuilderImpl builder = MailerBuilder
                 .withSMTPServer(resolveSmtpServer(), resolveSmtpPort())
@@ -90,12 +93,12 @@ public class MailerFactory {
             builder.clearEmailValidator();
         }
 
-        if (customMailer != null) {
-            builder.withCustomMailer(customMailer);
-        }
-
         Mailer mailer = builder.buildMailer();
-        return shutdownManager.onShutdown(mailer, Mailer::shutdownConnectionPool);
+        Mailer resultMailer = recipientOverrides != null
+                ? new RecipientOverrideMailer(mailer, resolveEmailOverrides(recipientOverrides))
+                : mailer;
+
+        return shutdownManager.onShutdown(resultMailer, Mailer::shutdownConnectionPool);
     }
 
     @BQConfigProperty("SMTP server used for mail delivery. '127.0.0.1' by default")
@@ -134,7 +137,6 @@ public class MailerFactory {
         this.threadPoolKeepAliveTime = threadPoolKeepAliveTime;
     }
 
-
     @BQConfigProperty
     public void setConnectionPoolCoreSize(Integer connectionPoolCoreSize) {
         this.connectionPoolCoreSize = connectionPoolCoreSize;
@@ -154,7 +156,6 @@ public class MailerFactory {
     public void setConnectionPoolClaimTimeout(Duration connectionPoolClaimTimeout) {
         this.connectionPoolClaimTimeout = connectionPoolClaimTimeout;
     }
-
 
     @BQConfigProperty("One of 'SMTP' (default), 'SMTP_TLS', 'SMTPS'")
     public void setTransportStrategy(TransportStrategy transportStrategy) {
@@ -218,5 +219,14 @@ public class MailerFactory {
 
     protected int resolveThreadPoolKeepAliveTimeMs() {
         return threadPoolKeepAliveTime != null ? (int) threadPoolKeepAliveTime.getDuration().toMillis() : 10;
+    }
+
+    protected List<Recipient> resolveEmailOverrides(Emails emails) {
+        List<Recipient> recipients = new ArrayList<>(emails.getEmails().length);
+        for (InternetAddress address : emails.getEmails()) {
+            recipients.add(new Recipient(address.getPersonal(), address.getAddress(), null));
+        }
+
+        return recipients;
     }
 }

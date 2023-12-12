@@ -183,8 +183,8 @@ public class SimpleJavaMailDeliveryIT {
     }
 
     @Test
-    @DisplayName("'recipientOverride'")
-    public void sendMail_RecipientOverride() throws MessagingException {
+    @DisplayName("'to' recipient override")
+    public void sendMail_RecipientOverride_To() throws MessagingException {
 
         GreenMailUser x = greenMail.setUser("x@example.org", "x", "secret");
         GreenMailUser z = greenMail.setUser("z@example.org", "z", "secret");
@@ -213,6 +213,79 @@ public class SimpleJavaMailDeliveryIT {
 
         assertEquals("y@example.org", message.getFrom()[0].toString());
         assertEquals("x@example.org", message.getRecipients(Message.RecipientType.TO)[0].toString());
+        assertNull(message.getRecipients(Message.RecipientType.CC));
+        assertEquals("test subject", message.getSubject());
+        assertEquals("test body", GreenMailUtil.getBody(message));
+    }
+
+    @Test
+    @DisplayName("'cc' recipient override")
+    public void sendMail_RecipientOverride_Cc() throws MessagingException {
+
+        GreenMailUser x = greenMail.setUser("x@example.org", "x", "secret");
+        GreenMailUser z = greenMail.setUser("z@example.org", "z", "secret");
+
+        Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.recipientOverrides", "z@example.org"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
+                .createRuntime()
+                .getInstance(Mailers.class);
+
+        Email email = EmailBuilder.startingBlank()
+                .from("y@example.org")
+                .cc("x@example.org")
+                .withSubject("test subject")
+                .withPlainText("test body")
+                .buildEmail();
+
+        sendSyncNoRetrieve(email, mailers.getDefaultMailer());
+
+        // must be delivered to the override address, but "To" address must be preserved..
+
+        assertNull(readFirst(x), "Was still delivered to the original address");
+        MimeMessage message = readFirst(z);
+        assertNotNull(message, "Was not delivered to the override address");
+
+        assertEquals("y@example.org", message.getFrom()[0].toString());
+        assertNull(message.getRecipients(Message.RecipientType.TO));
+        assertEquals("x@example.org", message.getRecipients(Message.RecipientType.CC)[0].toString());
+        assertEquals("test subject", message.getSubject());
+        assertEquals("test body", GreenMailUtil.getBody(message));
+    }
+
+    @Test
+    @DisplayName("'bcc' recipient override")
+    public void sendMail_RecipientOverride_Bcc() throws MessagingException {
+
+        GreenMailUser x = greenMail.setUser("x@example.org", "x", "secret");
+        GreenMailUser z = greenMail.setUser("z@example.org", "z", "secret");
+
+        Mailers mailers = testFactory.app()
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.recipientOverrides", "z@example.org"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.disabled", "false"))
+                .module(b -> BQCoreModule.extend(b).setProperty("bq.simplejavamail.mailers.x.smtpPort", "3025"))
+                .createRuntime()
+                .getInstance(Mailers.class);
+
+        Email email = EmailBuilder.startingBlank()
+                .from("y@example.org")
+                .bcc("x@example.org")
+                .withSubject("test subject")
+                .withPlainText("test body")
+                .buildEmail();
+
+        sendSyncNoRetrieve(email, mailers.getDefaultMailer());
+
+        // must be delivered to the override address, but "To" address must be preserved..
+
+        assertNull(readFirst(x), "Was still delivered to the original address");
+        MimeMessage message = readFirst(z);
+        assertNotNull(message, "Was not delivered to the override address");
+
+        assertEquals("y@example.org", message.getFrom()[0].toString());
+        assertNull(message.getRecipients(Message.RecipientType.TO));
+        assertNull(message.getRecipients(Message.RecipientType.CC));
         assertEquals("test subject", message.getSubject());
         assertEquals("test body", GreenMailUtil.getBody(message));
     }

@@ -21,7 +21,6 @@ package io.bootique.simplejavamail;
 import io.bootique.annotation.BQConfig;
 import io.bootique.annotation.BQConfigProperty;
 import io.bootique.shutdown.ShutdownManager;
-import org.simplejavamail.api.mailer.CustomMailer;
 import org.simplejavamail.api.mailer.Mailer;
 
 import javax.inject.Inject;
@@ -47,11 +46,10 @@ public class MailersFactory {
     }
 
     public Mailers create() {
-        CustomMailer customMailer = resolveRecipientOverrides();
         boolean disabled = resolveDisabled();
 
-        Map<String, Mailer> resolvedMailers = resolveMailers(customMailer, disabled);
-        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers, customMailer, disabled);
+        Map<String, Mailer> resolvedMailers = resolveMailers(disabled);
+        Mailer defaultMailer = resolveDefaultMailer(resolvedMailers, disabled);
         return new DefaultMailers(resolvedMailers, defaultMailer);
     }
 
@@ -76,11 +74,11 @@ public class MailersFactory {
         this.recipientOverrides = recipientOverrides;
     }
 
-    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers, CustomMailer customMailer, boolean disabled) {
+    protected Mailer resolveDefaultMailer(Map<String, Mailer> resolvedMailers, boolean disabled) {
         switch (resolvedMailers.size()) {
             case 0:
                 // provide an implicitly-configured default mailer
-                return new MailerFactory(shutdownManager).createMailer(customMailer, disabled);
+                return new MailerFactory(shutdownManager).createMailer(recipientOverrides, disabled);
             case 1:
                 return resolvedMailers.values().iterator().next();
             default:
@@ -88,23 +86,19 @@ public class MailersFactory {
         }
     }
 
-    protected Map<String, Mailer> resolveMailers(CustomMailer customMailer, boolean disabled) {
+    protected Map<String, Mailer> resolveMailers(boolean disabled) {
 
         if (mailers == null || mailers.isEmpty()) {
             return Collections.emptyMap();
         }
 
         Map<String, Mailer> resolved = new HashMap<>();
-        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(customMailer, disabled)));
+        mailers.forEach((k, v) -> resolved.put(k, v.createMailer(recipientOverrides, disabled)));
         return resolved;
     }
 
     protected boolean resolveDisabled() {
         // by default all Mailers are disabled to prevent delivery in non-production environments
         return this.disabled != null ? this.disabled : true;
-    }
-
-    protected CustomMailer resolveRecipientOverrides() {
-        return recipientOverrides != null ? new MailerWithOverriddenRecipients(recipientOverrides.getEmails()) : null;
     }
 }

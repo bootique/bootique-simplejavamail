@@ -1,6 +1,7 @@
 ## 3.0-M3
 
 * #6 (Jakarta migration) Deprecate the "javax" module
+* #8 Upgrade SimpleJavaMail Jakarta to v8
 
 ## 3.0.M1
 
