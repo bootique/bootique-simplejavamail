@@ -45,22 +45,21 @@ public class RecipientOverrideMailer implements Mailer {
         this.recipientOverrides = recipientOverrides;
     }
 
+    private Email resolveEmail(Email email) {
+        // if a user passed their own overrides, use them, otherwise force the preconfigured ones
+        return email.getOverrideReceivers().isEmpty()
+                ? EmailBuilder.copying(email).withOverrideReceivers(recipientOverrides).buildEmail()
+                : email;
+    }
+
     @Override
     public @NotNull CompletableFuture<Void> sendMail(Email email) {
-        Email withOverrides = EmailBuilder.copying(email)
-                .withOverrideReceivers(recipientOverrides)
-                .buildEmail();
-
-        return delegate.sendMail(withOverrides);
+        return delegate.sendMail(resolveEmail(email));
     }
 
     @Override
     public @NotNull CompletableFuture<Void> sendMail(Email email, boolean b) {
-        Email withOverrides = EmailBuilder.copying(email)
-                .withOverrideReceivers(recipientOverrides)
-                .buildEmail();
-
-        return delegate.sendMail(withOverrides, b);
+        return delegate.sendMail(resolveEmail(email), b);
     }
 
     @Override
