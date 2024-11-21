@@ -19,7 +19,6 @@
     </description>
 
     <properties>
-        <bootique.version>${project.version}</bootique.version>
         <simplejavamail6.version>6.7.6</simplejavamail6.version>
         <simplejavamail8.version>8.4.0</simplejavamail8.version>
         <greenmail1.version>1.6.9</greenmail1.version>
@@ -42,12 +41,12 @@
             <dependency>
                 <groupId>io.bootique</groupId>
                 <artifactId>bootique</artifactId>
-                <version>${bootique.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.bootique</groupId>
                 <artifactId>bootique-junit5</artifactId>
-                <version>${bootique.version}</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
