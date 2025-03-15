@@ -23,7 +23,7 @@ import io.bootique.annotation.BQConfigProperty;
 import io.bootique.shutdown.ShutdownManager;
 import org.simplejavamail.api.mailer.Mailer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
