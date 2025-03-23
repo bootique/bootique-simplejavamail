@@ -88,7 +88,7 @@ public class RecipientOverrideMailer implements Mailer {
     }
 
     @Override
-    public Future<?> shutdownConnectionPool() {
+    public Future<Void> shutdownConnectionPool() {
         return delegate.shutdownConnectionPool();
     }
 

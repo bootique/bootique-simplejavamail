@@ -1,3 +1,7 @@
+## 3.0-RC1
+
+* #9 Upgrade to Simple Java Mail 8.12.5
+
 ## 3.0-M3
 
 * #6 (Jakarta migration) Deprecate the "javax" module

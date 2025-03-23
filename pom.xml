@@ -20,7 +20,7 @@
 
     <properties>
         <simplejavamail6.version>6.7.6</simplejavamail6.version>
-        <simplejavamail8.version>8.4.0</simplejavamail8.version>
+        <simplejavamail8.version>8.12.5</simplejavamail8.version>
         <greenmail1.version>1.6.9</greenmail1.version>
         <greenmail2.version>2.0.1</greenmail2.version>
     </properties>
