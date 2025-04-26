@@ -1,3 +1,7 @@
+## 4.0-M1
+
+* #10 Remove deprecated modules (javax flavor)
+
 ## 3.0-RC1
 
 * #9 Upgrade to Simple Java Mail 8.12.5
