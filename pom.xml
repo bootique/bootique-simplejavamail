@@ -21,9 +21,6 @@
     <properties>
         <simplejavamail8.version>8.12.5</simplejavamail8.version>
         <greenmail2.version>2.0.1</greenmail2.version>
-
-        <!-- TODO: will be defined in "bootique-modules-parent" v.3.0.27 and can be removed from here -->
-        <activation2.version>2.1.3</activation2.version>
     </properties>
 
     <modules>
