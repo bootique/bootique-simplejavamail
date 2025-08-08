@@ -9,7 +9,7 @@
 
     <groupId>io.bootique.simplejavamail</groupId>
     <artifactId>bootique-simplejavamail-parent</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.0-M1</version>
 
     <packaging>pom</packaging>
 
@@ -30,7 +30,7 @@
     <scm>
         <developerConnection>scm:git:ssh://git@github.com/bootique/bootique-simplejavamail</developerConnection>
         <url>https://github.com/bootique/bootique-simplejavamail</url>
-        <tag>HEAD</tag>
+        <tag>4.0-M1</tag>
     </scm>
 
     <dependencyManagement>
