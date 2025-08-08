@@ -6,7 +6,11 @@
         <artifactId>bootique-simplejavamail-parent</artifactId>
         <version>4.0-SNAPSHOT</version>
     </parent>
+
     <artifactId>bootique-simplejavamail</artifactId>
+
+    <name>bootique-simplejavamail: Simple Java Mail integration module</name>
+    <description>Simple Java Mail integration module</description>
 
     <dependencyManagement>
         <dependencies>
