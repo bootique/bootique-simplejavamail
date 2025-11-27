@@ -21,6 +21,7 @@
 
     <properties>
         <simplejavamail8.version>8.12.6</simplejavamail8.version>
+        <angus.mail.version>2.0.5</angus.mail.version>
         <greenmail.version>2.1.7</greenmail.version>
     </properties>
 
@@ -55,6 +56,10 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.angus</groupId>
+                        <artifactId>angus-mail</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -65,6 +70,17 @@
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
+                <version>${angus.mail.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>jakarta.mail</groupId>
+                        <artifactId>jakarta.mail-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

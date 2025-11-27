@@ -1,6 +1,7 @@
 ## 4.0-M2
 
 #11 Upgrade to simple-java-mail 8.12.6
+#12 Upgrade to angus-mail 2.0.5
 
 ## 4.0-M1
 
