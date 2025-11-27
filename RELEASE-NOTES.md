@@ -1,3 +1,8 @@
+## 3.0-RC2
+
+#11 Upgrade to simple-java-mail 8.12.6
+#12 Upgrade to angus-mail 2.0.5
+
 ## 3.0-RC1
 
 * #9 Upgrade to Simple Java Mail 8.12.5
