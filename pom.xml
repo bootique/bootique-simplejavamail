@@ -21,7 +21,7 @@
 
     <properties>
         <simplejavamail8.version>8.12.6</simplejavamail8.version>
-        <greenmail2.version>2.0.1</greenmail2.version>
+        <greenmail.version>2.1.7</greenmail.version>
     </properties>
 
     <modules>
@@ -71,7 +71,7 @@
             <dependency>
                 <groupId>com.icegreen</groupId>
                 <artifactId>greenmail-junit5</artifactId>
-                <version>${greenmail2.version}</version>
+                <version>${greenmail.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.junit.jupiter</groupId>
